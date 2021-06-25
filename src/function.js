@@ -152,6 +152,8 @@ export function generateNewContainer(cartItem) {
 		shoppingCart.push(singleShoppingCartItem);
 		//console.log(result.height, "height");
 		//console.log(cart, "cart");
+		//console.log(result.height, "height");
+		//console.log(cart, "cart");
 		const newContainer = {
 			height: result.height,
 			length: result.length,
