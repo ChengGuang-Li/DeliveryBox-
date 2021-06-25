@@ -1,3 +1,4 @@
+/* eslint-disable no-new-object */
 /* eslint-disable no-array-constructor */
 export function GenerateSmartSendContainerDimension(
 	l,
@@ -16,7 +17,9 @@ export function GenerateSmartSendContainerDimension(
 	let hStep = Math.ceil(quantity / (wStep * lStep));
 	let minorStep = Math.floor(l / h);
 	let vHeight = h * hStep;
+
 	let LENGTH_LAYER_MAX4 = 4000;
+
 	let maxwStep = Math.floor(LENGTH_LAYER_MAX4 / w);
 	let maxlStep = Math.floor(LENGTH_LAYER_MAX4 / l);
 	let maxhStep = Math.floor(LENGTH_LAYER_MAX4 / h);
@@ -73,13 +76,13 @@ export function GenerateSmartSendContainerDimension(
 		}
 	}
 	hStep = Math.ceil(quantity / (wStep * lStep));
-	console.log("hStep:", hStep, "  ", "maxhStep:", maxhStep);
+	//console.log("hStep:", hStep, "  ", "maxhStep:", maxhStep);
 	newContainer.length = lStep * l;
 	newContainer.width = wStep * w;
 	newContainer.height = hStep * h;
 
 	if (hStep > maxhStep) {
-		console.log("pase");
+		//console.log("pase");
 		if (wStep + 1 > maxwStep) lStep += 1;
 		else wStep += 1;
 
@@ -104,6 +107,61 @@ export function GenerateSmartSendContainerDimension(
 			true
 		);
 	}
-	console.log(wStep, "++");
+	//console.log(wStep, "++");
 	return newContainer;
+}
+
+export function generateNewContainer(cartItem) {
+	let lssc = [];
+	//create object
+	const MAX_CONTAINER_WEIGHT = 1000000; //1000kg
+	const VOLUME_LAYER_MAX = 64000000000; //64 cubic meters
+	let array = new Array(cartItem.length, cartItem.width, cartItem.height);
+	array.sort((v1, v2) => {
+		return v2 - v1;
+	});
+
+	const l = array[0];
+	const w = array[1];
+	const h = array[2];
+	//let length, width, height;
+	const wbatch = Math.ceil(MAX_CONTAINER_WEIGHT / cartItem.Weight);
+	const vbatch = Math.ceil(VOLUME_LAYER_MAX / (l * w * h));
+	//console.log(vbatch, "vbatch");
+	let left = cartItem.quantity;
+	while (left > 0) {
+		let process = Math.min(left, Math.min(wbatch, vbatch));
+		let result = GenerateSmartSendContainerDimension(
+			l,
+			w,
+			h,
+			process,
+			1,
+			1,
+			true
+		);
+		//console.log(result, "xxx");
+
+		let shoppingCart = new Array();
+		//deep clone
+		let _obj = JSON.stringify(cartItem);
+		let singleShoppingCartItem = JSON.parse(_obj);
+
+		singleShoppingCartItem.quantity = process;
+		//console.log(singleShoppingCartItem, "singleItem");
+		shoppingCart.push(singleShoppingCartItem);
+		//console.log(result.height, "height");
+		//console.log(cart, "cart");
+		const newContainer = {
+			height: result.height,
+			length: result.length,
+			width: result.width,
+			cart: shoppingCart,
+		};
+		console.log(newContainer, "newContainer");
+		//ssc.Cart = cart;
+		lssc.push(newContainer);
+		left -= process;
+	}
+	return lssc;
 }
