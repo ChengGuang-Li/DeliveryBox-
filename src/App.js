@@ -1,8 +1,12 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { GenerateSmartSendContainerDimension } from "./function.js";
+import {
+	GenerateSmartSendContainerDimension,
+	generateNewContainer,
+} from "./function.js";
 import { useState } from "react";
 import { Container, Row, Col } from "react-grid-system";
+import { NewContainer } from "./component/NewContainer.js";
 
 function App() {
 	// create new container
@@ -11,30 +15,45 @@ function App() {
 		width: 0,
 		height: 0,
 	};
-	const [length, setLength] = useState("unknow");
-	const [width, setWidth] = useState("unknow");
-	const [height, setHeight] = useState("unknow");
 	const [originalL, setOriginalL] = useState(400);
-	const [originalW, setoriginalW] = useState(200);
+	const [originalW, setoriginalW] = useState(400);
 	const [originalH, setoriginalH] = useState(400);
-	const [quantity, setquantity] = useState(500);
+	const [quantity, setquantity] = useState(2001);
+	const [weight, setWeight] = useState(5000);
+	const [data, setData] = useState([]);
+	//carItem object
+	function createCarItem(length, width, height, quantity, weight) {
+		let cartItem = new Object();
+		cartItem.length = length;
+		cartItem.width = width;
+		cartItem.height = height;
+		cartItem.quantity = quantity;
+		cartItem.Weight = weight;
+		return cartItem;
+	}
 
 	const getData = async function () {
-		let result = await GenerateSmartSendContainerDimension(
-			400, // original length
-			200, //original width
-			400, //original height
-			500, //quantity
-			1, //l Step
-			1, // w Step
-			true
-		);
-
-		console.log(result);
-		setLength(result.length);
-		setWidth(result.width);
-		setHeight(result.height);
+		const cartItem = createCarItem(400, 400, 400, 2001, 5000);
+		let result = await generateNewContainer(cartItem);
+		setData(result);
 	};
+
+	// const getData = async function () {
+	// 	let result = await GenerateSmartSendContainerDimension(
+	// 		400, // original length
+	// 		200, //original width
+	// 		400, //original height
+	// 		2001, //quantitye
+	// 		1, //l Step
+	// 		1, // w Step
+	// 		true
+	// 	);
+
+	// 	console.log(result);
+	// 	setLength(result.length);
+	// 	setWidth(result.width);
+	// 	setHeight(result.height);
+	// };
 	return (
 		<div>
 			<button className="btn-worker" onClick={getData}>
@@ -57,30 +76,20 @@ function App() {
 						{originalH}mm
 					</Col>
 				</Row>
-				<h1> Quantity Of Items</h1>
 				<Row>
 					{" "}
 					<Col sm={4}>
-						<h2>Number </h2>
+						<h2>Quantity of items</h2>
 						{quantity}
+					</Col>
+					<Col sm={4}>
+						<h2>weight of item</h2>
+						{weight}g
 					</Col>
 				</Row>
 				<hr />
-				<h1> The New Express box Size :</h1>
-				<Row>
-					<Col sm={4}>
-						<h2>length of the new box </h2>
-						<h3 className="h3">{length}mm</h3>
-					</Col>
-					<Col sm={4}>
-						<h2>width of the new box </h2>
-						<h3 className="h3">{width}mm</h3>
-					</Col>
-					<Col sm={4}>
-						<h2>height of the new box </h2>
-						<h3 className="h3">{height}mm</h3>
-					</Col>
-				</Row>
+				<h1> The Size of New Express boxes:</h1>
+				<NewContainer data={data}> </NewContainer>
 			</Container>
 		</div>
 	);
